@@ -10,7 +10,7 @@ import glowFragment from "./shaders/glow.fragment.glsl?raw";
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const CAMERA_DISTANCE = 2.5;
+const CAMERA_DISTANCE = 2.1;
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector("canvas")!,
@@ -57,7 +57,7 @@ window.requestAnimationFrame(function renderFrame() {
 
   clock.getDelta();
 
-  globe.rotation.y += 0.001;
+  globe.rotation.y += 0.004;
 
   camera.position.x = Math.cos(clock.elapsedTime * 0.01) * CAMERA_DISTANCE;
   camera.position.z = Math.sin(clock.elapsedTime * 0.01) * CAMERA_DISTANCE;
@@ -70,6 +70,8 @@ window.requestAnimationFrame(function renderFrame() {
 
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+  globe.material.uniforms.time.value = clock.elapsedTime;
+
   renderer.render(scene, camera);
 });
 
@@ -79,11 +81,17 @@ function createGlobe(): THREE.Mesh {
     vertexShader: globeVertex,
     fragmentShader: globeFragment,
     uniforms: {
-      globeTexture: {
-        value: new THREE.TextureLoader().load("./img/globe-texture.jpg"),
+      globeTextureDay: {
+        value: new THREE.TextureLoader().load("./img/8k_earth_daymap.jpg"),
+      },
+      globeTextureNight: {
+        value: new THREE.TextureLoader().load("./img/8k_earth_nightmap.jpg"),
       },
       globeHeightTexture: {
         value: new THREE.TextureLoader().load("./img/8081_earthbump4k.jpg"),
+      },
+      time: {
+        value: clock.elapsedTime,
       },
     },
   });
@@ -94,7 +102,7 @@ function createGlobe(): THREE.Mesh {
 }
 
 function createGlow(): THREE.Mesh<THREE.SphereGeometry> {
-  const geometry = new THREE.SphereGeometry(1, 32, 32);
+  const geometry = new THREE.SphereGeometry(1, 16, 16);
   const material = new THREE.ShaderMaterial({
     vertexShader: glowVertex,
     fragmentShader: glowFragment,
@@ -115,7 +123,7 @@ function createStars(): THREE.Points {
     color: 0xffffff,
   });
 
-  const pointsCount = 10000;
+  const pointsCount = 5000;
   const points = new Array(pointsCount * 3);
   for (let i = 0; i < pointsCount; i++) {
     const x = (Math.random() - 0.5) * width;

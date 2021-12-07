@@ -9,7 +9,7 @@ void main() {
     
     vec3 color = vec3(0.4, 0.6, 1);
 
-    float atmosphere = pow(dot(vertexNormal, vec3(0, 0, -1)), 1.0);
+    float atmosphere = dot(vertexNormal, vec3(0, 0, -1));
     
     gl_FragColor = vec4(color * atmosphere * 2.5, 1);
 }
