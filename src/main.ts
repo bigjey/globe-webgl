@@ -63,7 +63,7 @@ window.requestAnimationFrame(function renderFrame() {
   camera.position.z = Math.sin(clock.elapsedTime * 0.01) * CAMERA_DISTANCE;
 
   gsap.to(group.rotation, {
-    y: (mouse.x * Math.PI) / 2,
+    y: (mouse.x * Math.PI) / 4,
     z: -mouse.y * (Math.PI / 4),
     duration: 1,
   });
