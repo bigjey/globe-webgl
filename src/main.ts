@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import gsap from "gsap";
 
 import globeVertex from "./shaders/globe.vertex.glsl?raw";
 import globeFragment from "./shaders/globe.fragment.glsl?raw";
@@ -67,14 +66,19 @@ const people = [
     lng: 27.19903,
   },
   {
-    name: "wroclaw",
+    name: "Wroclaw",
     lat: 51.107883,
     lng: 17.038538,
+  },
+  {
+    name: "Ancona",
+    lat: 43.616943,
+    lng: 13.516667,
   },
 ];
 
 for (const p of people) {
-  const pin = createPin(0.003);
+  const pin = createPin();
 
   let r = 1.001;
   let theta = ((180 - (p.lat + 90)) * Math.PI) / 180;
@@ -181,9 +185,10 @@ function createStars(): THREE.Points {
   return mesh;
 }
 
-function createPin(
-  r: number
-): THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial> {
+function createPin(): THREE.Mesh<
+  THREE.BufferGeometry,
+  THREE.MeshBasicMaterial
+> {
   const geometry = new THREE.BoxGeometry(0.001, 0.1, 0.001);
   const material = new THREE.MeshBasicMaterial({
     color: "white",
