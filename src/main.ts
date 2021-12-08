@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import gsap from "gsap";
 
 import globeVertex from "./shaders/globe.vertex.glsl?raw";
@@ -10,7 +11,7 @@ import glowFragment from "./shaders/glow.fragment.glsl?raw";
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const CAMERA_DISTANCE = 2.1;
+const CAMERA_DISTANCE = 2;
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector("canvas")!,
@@ -24,6 +25,8 @@ const fov = 75;
 const aspect = width / height;
 const camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 1000);
 camera.position.z = CAMERA_DISTANCE;
+
+const controls = new OrbitControls(camera, renderer.domElement);
 
 const scene = new THREE.Scene();
 
@@ -42,35 +45,68 @@ scene.add(glow);
 const stars = createStars();
 scene.add(stars);
 
-const mouse = {
-  x: 0,
-  y: 0,
-};
+const people = [
+  {
+    name: "Denchik",
+    lat: 52.5144,
+    lng: 4.9641,
+  },
+  {
+    name: "Katrusya",
+    lat: 41.3874,
+    lng: 2.1686,
+  },
+  {
+    name: "Chub",
+    lat: 49.423,
+    lng: 26.9871,
+  },
+  {
+    name: "Mr X",
+    lat: 49.75996,
+    lng: 27.19903,
+  },
+  {
+    name: "wroclaw",
+    lat: 51.107883,
+    lng: 17.038538,
+  },
+];
 
-document.addEventListener("mousemove", function (e) {
-  mouse.x = (e.clientX / width) * 2 - 1;
-  mouse.y = (e.pageY / height) * 2 - 1;
-});
+for (const p of people) {
+  const pin = createPin(0.003);
+
+  let r = 1.001;
+  let theta = ((180 - (p.lat + 90)) * Math.PI) / 180;
+  let phi = ((p.lng + 90) * Math.PI) / 180;
+
+  const spherePos = new THREE.Spherical(r, theta, phi);
+
+  pin.position.setFromSpherical(spherePos);
+
+  const newUp = new THREE.Vector3()
+    .setFromSpherical(spherePos)
+    .multiplyScalar(2);
+
+  pin.lookAt(newUp);
+  pin.rotation.x = Math.PI / 2;
+  pin.rotation.z = Math.PI / 2;
+
+  scene.add(pin);
+}
+
+controls.update();
 
 window.requestAnimationFrame(function renderFrame() {
   window.requestAnimationFrame(renderFrame);
 
   clock.getDelta();
 
-  globe.rotation.y += 0.004;
-
-  camera.position.x = Math.cos(clock.elapsedTime * 0.01) * CAMERA_DISTANCE;
-  camera.position.z = Math.sin(clock.elapsedTime * 0.01) * CAMERA_DISTANCE;
-
-  gsap.to(group.rotation, {
-    y: (mouse.x * Math.PI) / 4,
-    z: -mouse.y * (Math.PI / 4),
-    duration: 1,
-  });
-
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   globe.material.uniforms.time.value = clock.elapsedTime;
+
+  controls.update();
 
   renderer.render(scene, camera);
 });
@@ -141,6 +177,19 @@ function createStars(): THREE.Points {
   );
 
   const mesh = new THREE.Points(geometry, material);
+
+  return mesh;
+}
+
+function createPin(
+  r: number
+): THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial> {
+  const geometry = new THREE.BoxGeometry(0.001, 0.1, 0.001);
+  const material = new THREE.MeshBasicMaterial({
+    color: "white",
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
 
   return mesh;
 }

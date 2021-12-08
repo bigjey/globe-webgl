@@ -10,7 +10,7 @@ void main() {
     vec3 colorDay = texture2D(globeTextureDay, vertexUV).rgb;
     vec3 colorNight = texture2D(globeTextureNight, vertexUV).rgb;
 
-    vec3 sun = normalize(vec3(cos(time), sin(time), sin(time)));
+    vec3 sun = normalize(vec3(cos(time / 5.0), sin(time / 5.0), sin(time / 5.0)));
     float dayPercentage = max(0.0, dot(vertexNormal, sun));
 
     vec3 color = mix(colorNight, colorDay, dayPercentage);
