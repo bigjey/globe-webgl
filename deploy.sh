@@ -12,6 +12,6 @@ cd dist
 git init
 git add -A
 git commit -m 'deploy'
-git push -f git@github.com:bigjey/globe-webgl.git main:gh-pages
+git push -f https://github.com/bigjey/globe-webgl.git gh-pages
 
 cd -
